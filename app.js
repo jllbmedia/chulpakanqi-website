@@ -299,6 +299,70 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+
+  // 8. Bento Grid Amenities Interactive Slider
+  const bentoSlides = document.querySelectorAll("#bento-card-amenities-slider .bento-slide");
+  const bentoDots = document.querySelectorAll("#bento-card-amenities-slider .slider-dot");
+  let bentoActiveIndex = 0;
+  let bentoSliderInterval;
+
+  if (bentoSlides.length > 0 && bentoDots.length > 0) {
+    function switchBentoSlide(newIndex) {
+      if (newIndex === bentoActiveIndex) return;
+
+      const currentSlide = bentoSlides[bentoActiveIndex];
+      const nextSlide = bentoSlides[newIndex];
+
+      // Deactivate current slide and dot
+      currentSlide.classList.remove("active");
+      bentoDots[bentoActiveIndex].classList.remove("active");
+
+      // Activate next slide and dot
+      nextSlide.classList.add("active");
+      bentoDots[newIndex].classList.add("active");
+
+      // Premium vertical text reveal stagger using GSAP
+      const nextTextElements = nextSlide.querySelectorAll(".card-eyebrow, .card-title, .card-text");
+      gsap.fromTo(nextTextElements, {
+        opacity: 0,
+        y: 12,
+      }, {
+        opacity: 1,
+        y: 0,
+        stagger: 0.08,
+        duration: 0.6,
+        ease: "power2.out"
+      });
+
+      bentoActiveIndex = newIndex;
+    }
+
+    function startBentoAutoplay() {
+      stopBentoAutoplay();
+      bentoSliderInterval = setInterval(() => {
+        let nextIndex = (bentoActiveIndex + 1) % bentoSlides.length;
+        switchBentoSlide(nextIndex);
+      }, 5000);
+    }
+
+    function stopBentoAutoplay() {
+      if (bentoSliderInterval) {
+        clearInterval(bentoSliderInterval);
+      }
+    }
+
+    // Attach dot click interaction
+    bentoDots.forEach((dot, index) => {
+      dot.addEventListener("click", () => {
+        stopBentoAutoplay();
+        switchBentoSlide(index);
+        startBentoAutoplay();
+      });
+    });
+
+    startBentoAutoplay();
+  }
+
   // Smooth link transitions managed by Lenis
   const navLinks = document.querySelectorAll('a[href^="#"]');
   navLinks.forEach(link => {
@@ -320,3 +384,4 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 });
+
